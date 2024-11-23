@@ -6,9 +6,9 @@ export default defineConfig({
   plugins: [
     vue({
       template: {
-        compilerOptions: {
-          isCustomElement: (tag) => tag.startsWith('V-'),
-        },
+        // compilerOptions: {
+        //   isCustomElement: (tag) => tag.startsWith('V'),
+        // },
       },
     }),
   ],
