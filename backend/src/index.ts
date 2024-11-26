@@ -34,7 +34,6 @@ io.on(
     console.log('a user connected: ', socket.id);
 
     socket.on('message', (item: string, id: string) => {
-      console.log('message: ' + item + id);
       io.emit('message', item, socket.id);
     });
 

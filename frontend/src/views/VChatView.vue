@@ -4,12 +4,13 @@
       <VMessage
         v-for="(item, index) in messageList"
         :key="index"
-        :message="item"
+        :message="item.value"
+        :isMine="item.isMine"
       />
     </div>
 
     <div
-      class="absolute bottom-0 w-full flex flex-col px-2 pb-1 border-t border-t-gray-700 dark:border-t-gray-500"
+      class="absolute bottom-0 w-full max-h-44 flex flex-col px-2 pb-1 border-t border-t-gray-700 dark:border-t-gray-500 dark:bg-gray-700 bg-white"
     >
       <input
         placeholder="Message"
@@ -29,8 +30,13 @@ import { ref, onMounted, onBeforeMount } from 'vue';
 import VMessage from '../components/VMessage.vue';
 import socket from '../../socket';
 
+interface messageItem {
+  value: string;
+  isMine: boolean;
+}
+
 let message = ref<string>('');
-let messageList = ref<string[]>([]);
+let messageList = ref<messageItem[]>([]);
 
 onMounted(() => {
   socket.connect();
@@ -43,13 +49,16 @@ onBeforeMount(() => {
 
 function handleMessage(data: string, id: string) {
   if (id !== socket.id) {
-    messageList.value.push(data);
+    messageList.value.push({ value: data, isMine: id == socket.id });
   }
 }
 
 function handleSubmit() {
   if (message.value.trim()) {
-    messageList.value.push(message.value);
+    messageList.value.push({
+      value: message.value,
+      isMine: true,
+    });
     socket.emit('message', message.value, socket.id as string);
     message.value = '';
   }
