@@ -8,11 +8,11 @@ const app = express();
 const server = createServer(app);
 
 interface ServerToClientEvents {
-  message: (item: string) => void;
+  message: (item: string, id: string) => void;
 }
 
 interface ClientToServerEvents {
-  message: (item: string) => void;
+  message: (item: string, id: string) => void;
 }
 
 const io = new Server<ServerToClientEvents, ClientToServerEvents>(server, {
@@ -31,11 +31,11 @@ app.get('/', (req, res) => {
 io.on(
   'connection',
   (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
-    console.log('a user connected');
+    console.log('a user connected: ', socket.id);
 
-    socket.on('message', (item: string) => {
-      console.log('message: ' + item);
-      io.emit('message', item);
+    socket.on('message', (item: string, id: string) => {
+      console.log('message: ' + item + id);
+      io.emit('message', item, socket.id);
     });
 
     socket.on('disconnect', () => {

@@ -9,7 +9,7 @@
     </div>
 
     <div
-      class="absolute bottom-0 w-full flex flex-col px-2 pb-1 border-t border-t-gray-500"
+      class="absolute bottom-0 w-full flex flex-col px-2 pb-1 border-t border-t-gray-700 dark:border-t-gray-500"
     >
       <input
         placeholder="Message"
@@ -25,14 +25,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import VMessage from '../components/VMessage.vue';
+import socket from '../../socket';
 
-let message = ref('' as string);
-let messageList = ref([] as string[]);
+let message = ref<string>('');
+let messageList = ref<string[]>([]);
+
+onMounted(() => {
+  socket.connect();
+  socket.on('message', handleMessage);
+});
+
+onBeforeMount(() => {
+  socket.disconnect();
+});
+
+function handleMessage(data: string, id: string) {
+  if (id !== socket.id) {
+    messageList.value.push(data);
+  }
+}
 
 function handleSubmit() {
-  messageList.value.push(message.value);
-  message.value = '';
+  if (message.value.trim()) {
+    messageList.value.push(message.value);
+    socket.emit('message', message.value, socket.id as string);
+    message.value = '';
+  }
 }
 </script>
