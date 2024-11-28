@@ -1,6 +1,12 @@
 <template>
   <div class="flex flex-col">
-    <div class="h-screen relative overflow-auto pb-10 flex flex-col">
+    <div class="absolute z-10 w-full flex justify-center bg-gray-300">
+      status bar TOBE handled
+    </div>
+
+    <div
+      class="h-screen relative overflow-auto py-10 flex flex-col scroll-smooth"
+    >
       <VMessage
         v-for="(item, index) in messageList"
         :key="index"
