@@ -1,31 +1,33 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
-const PORT = 3000;
-const ORIGIN = 'http://localhost:5173';
+import dotenv from 'dotenv';
+import routes from './routes/routes';
+import cors from 'cors';
+import {
+  ServerToClientEvents,
+  ClientToServerEvents,
+} from './interfaces/socket.interfaces';
+
+dotenv.config();
+
+const PORT = process.env.PORT;
+const ORIGIN = process.env.FE_ORIGIN;
+const generalRouting = '';
 
 const app = express();
+app.use(express.json());
+app.use(cors());
+app.use(generalRouting, routes);
+app.use('*', routes);
+
 const server = createServer(app);
-
-interface ServerToClientEvents {
-  message: (item: string, id: string) => void;
-}
-
-interface ClientToServerEvents {
-  message: (item: string, id: string) => void;
-}
 
 const io = new Server<ServerToClientEvents, ClientToServerEvents>(server, {
   cors: {
     origin: ORIGIN,
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
   },
-});
-
-app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'connection' });
 });
 
 io.on(
