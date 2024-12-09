@@ -3,4 +3,6 @@ export interface Message {
   updatedAt: string;
   deletedAt: string | null;
   value: string;
+  username: string;
+  nick: string;
 }

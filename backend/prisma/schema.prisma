@@ -19,4 +19,5 @@ model Post {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   value     String?
+  nick      String?
 }

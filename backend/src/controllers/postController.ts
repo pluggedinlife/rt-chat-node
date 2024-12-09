@@ -6,7 +6,11 @@ import { Message } from '../interfaces/post.interface';
 export default class PostController {
   public static async onGetPosts(req: express.Request, res: express.Response) {
     try {
-      const result = await prisma.post.findMany();
+      const result = await prisma.post.findMany({
+        where: {
+          deletedAt: null,
+        },
+      });
       res.status(200).json(result);
     } catch (e) {
       console.log(`Something went wrong in onGetPosts: `, e);
@@ -23,6 +27,8 @@ export default class PostController {
         createdAt: moment().toISOString(),
         updatedAt: moment().toISOString(),
         deletedAt: null,
+        username: req.body.username,
+        nick: req.body.nick,
       };
 
       const result = await prisma.post.create({
@@ -36,7 +42,7 @@ export default class PostController {
 
   public static async onEditPost(req: express.Request, res: express.Response) {
     try {
-      const id = req.body.id;
+      const id = parseInt(req.params.id) || undefined;
 
       const result = await prisma.post.update({
         where: {
@@ -58,13 +64,31 @@ export default class PostController {
     res: express.Response
   ) {
     try {
-      const id = req.body.id;
+      const id = parseInt(req.params.id) || undefined;
 
-      const result = await prisma.post.delete({
+      let result = await prisma.post.findFirst({
         where: {
           id,
         },
       });
+
+      // Implement soft-delete as first option, then if the user insists delete the record permanently
+      if (result?.deletedAt == undefined) {
+        result = await prisma.post.update({
+          where: {
+            id,
+          },
+          data: {
+            deletedAt: moment().toISOString(),
+          },
+        });
+      } else {
+        result = await prisma.post.delete({
+          where: {
+            id,
+          },
+        });
+      }
 
       res.status(200).json(result);
     } catch (e) {
