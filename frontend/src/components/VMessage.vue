@@ -12,7 +12,8 @@ const props = defineProps({
 <template>
   <div class="p-2 flex" :class="isMine ? ' justify-end' : ''">
     <span
-      class="bg-blue-200 dark:text-gray-800 px-2 py-1 rounded-xl max-w-full break-words"
+      class="dark:text-gray-800 px-2 py-1 rounded-xl max-w-full break-words"
+      :class="isMine ? 'bg-blue-200' : 'bg-green-200'"
       >{{ props.message }}</span
     >
   </div>

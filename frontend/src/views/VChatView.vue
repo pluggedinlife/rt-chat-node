@@ -1,9 +1,5 @@
 <template>
   <div class="flex flex-col">
-    <div class="absolute z-10 w-full flex justify-center bg-gray-300">
-      status bar TOBE handled
-    </div>
-
     <div
       class="h-screen relative overflow-auto py-10 flex flex-col scroll-smooth"
     >
@@ -35,6 +31,9 @@
 import { ref, onMounted, onBeforeMount } from 'vue';
 import VMessage from '../components/VMessage.vue';
 import socket from '../../socket';
+import { postStore } from '../store/post.store';
+
+const store = postStore();
 
 interface messageItem {
   value: string;
@@ -44,9 +43,17 @@ interface messageItem {
 let message = ref<string>('');
 let messageList = ref<messageItem[]>([]);
 
-onMounted(() => {
+onMounted(async () => {
   socket.connect();
   socket.on('message', handleMessage);
+  await store.fetchPosts();
+
+  if (store.getPostList.length > 0) {
+    messageList.value = store.getPostList.map((item: any) => ({
+      value: item.value,
+      isMine: item.nick == store.currentUser,
+    }));
+  }
 });
 
 onBeforeMount(() => {
@@ -59,8 +66,13 @@ function handleMessage(data: string, id: string) {
   }
 }
 
-function handleSubmit() {
+function computedCurrentUser() {
+  return store.getCurrentUser;
+}
+
+async function handleSubmit() {
   if (message.value.trim()) {
+    await store.sendPost(message.value, computedCurrentUser());
     messageList.value.push({
       value: message.value,
       isMine: true,
