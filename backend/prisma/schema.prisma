@@ -13,11 +13,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  username  String
+  password  String
+  nick      String
+  color     String?
+  avatar    String?
+  posts     Post[]
+}
+
 model Post {
   id        Int       @id @default(autoincrement())
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  value     String?
-  nick      String?
+  text      String
+  media     String?
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
 }

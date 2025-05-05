@@ -1,7 +1,7 @@
 import express from 'express';
 import moment from 'moment';
 import prisma from '../prisma';
-import { Message } from '../interfaces/post.interface';
+import { PostInterface } from '../interfaces/post.interface';
 
 export default class PostController {
   public static async onGetPosts(req: express.Request, res: express.Response) {
@@ -22,17 +22,15 @@ export default class PostController {
     res: express.Response
   ) {
     try {
-      const newMessage: Message = {
-        value: req.body.value,
-        createdAt: moment().toISOString(),
-        updatedAt: moment().toISOString(),
-        deletedAt: null,
-        username: req.body.username,
-        nick: req.body.nick,
+      const { text, media, userId } = req.body;
+      const newItem: PostInterface = {
+        text,
+        media,
+        userId,
       };
 
       const result = await prisma.post.create({
-        data: newMessage,
+        data: newItem,
       });
       res.status(200).json(result);
     } catch (e) {
@@ -43,13 +41,16 @@ export default class PostController {
   public static async onEditPost(req: express.Request, res: express.Response) {
     try {
       const id = parseInt(req.params.id) || undefined;
+      const { text, media, userId } = req.body;
 
       const result = await prisma.post.update({
         where: {
           id,
         },
         data: {
-          value: req.body.value,
+          text,
+          media,
+          userId,
         },
       });
 

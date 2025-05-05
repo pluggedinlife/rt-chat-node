@@ -1,8 +1,5 @@
-export interface Message {
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  value: string;
-  username: string;
-  nick: string;
+export interface PostInterface {
+  text: string;
+  media: string | null;
+  userId: number;
 }

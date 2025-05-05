@@ -5,6 +5,7 @@
     >
       <VMessage
         v-for="(item, index) in messageList"
+        :id="index"
         :key="index"
         :message="item.value"
         :isMine="item.isMine"
